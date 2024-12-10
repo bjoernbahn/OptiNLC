@@ -50,7 +50,7 @@ target_link_libraries(
 
 file(GLOB TEST_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/test/*.cpp")
 add_executable(${PROJECT_NAME}_TestRunner ${TEST_SOURCES})
-target_compile_options(${PROJECT_NAME}_TestRunner PRIVATE -fpermissive)#REQUIRED for osqp
+#target_compile_options(${PROJECT_NAME}_TestRunner PRIVATE -fpermissive)#REQUIRED for osqp
 target_link_libraries(
     ${PROJECT_NAME}_TestRunner
     PRIVATE
