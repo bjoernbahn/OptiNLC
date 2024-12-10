@@ -1,0 +1,6 @@
+g++
+gcc
+make
+cmake
+libboost-all-dev
+catch2
