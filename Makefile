@@ -48,7 +48,7 @@ _build:
 test: build
 	mkdir -p ${OUTPUT_DIRECTORY}
 	#docker run -it -v ${OUTPUT_DIRECTORY}:/tmp/output ${PROJECT}:${TAG} /bin/bash -c 'mkdir -p /tmp/output/ && cd /tmp/output/'
-	docker run -it -v ${OUTPUT_DIRECTORY}:/tmp/output ${PROJECT}:${TAG} /bin/bash -c 'cd /tmp/output && /tmp/OptiNLC/OptiNLC/build/OptiNLC_TestRunner -d yes'
+	docker run -t -v ${OUTPUT_DIRECTORY}:/tmp/output ${PROJECT}:${TAG} /bin/bash -c 'cd /tmp/output && /tmp/OptiNLC/OptiNLC/build/OptiNLC_TestRunner -d yes'
 	#docker run --volume ${OUTPUT_DIRECTORY}:/tmp/output ${PROJECT}:${TAG} /bin/bash -c 'touch /tmp/output/hello.txt'
 
 .PHONY: plot
