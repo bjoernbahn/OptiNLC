@@ -48,7 +48,7 @@ public:
   }
 
   double
-  get_final_objeive_function() const
+  get_final_objective_function() const
   {
     return final_obj_function_;
   }
