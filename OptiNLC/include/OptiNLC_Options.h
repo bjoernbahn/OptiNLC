@@ -32,6 +32,8 @@ struct OptiNLC_Options
   double OptiNLC_ACC        = 1e-6; // Accuracy for the Sequential Quadratic Programming (SQP) method
   double OptiNLC_time_limit = 0.5;  // Time limit for OptiNLC solver
 
+  bool debugPrint = false; // Print for debugging
+
   /**
    * @brief Loads default options for the OptiNLC toolbox.
    * This is already handled by default member initializers but kept for explicit usage.
@@ -57,5 +59,7 @@ struct OptiNLC_Options
     SQP_ACC            = 1e-6;
     OptiNLC_ACC        = 1e-6;
     OptiNLC_time_limit = 0.5;
+
+    debugPrint = false;
   }
 };

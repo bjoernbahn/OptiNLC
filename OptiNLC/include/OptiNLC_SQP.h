@@ -26,13 +26,6 @@ public:
   OptiNLC_SQP( OptProblem& op, OptiNLC_Options* options ) :
     Problem( op )
   {
-    std::cerr << "\n********************************************************";
-    std::cerr << "\nSequential Quadratic Problem has created an optimization problem";
-    std::cerr << "\nNumber of Inputs:         " << InputSize;
-    std::cerr << "\nNumber of States:         " << StateSize;
-    std::cerr << "\nNumber of Constraints:    " << ConstraintSize;
-    std::cerr << "\nNumber of Control Points: " << NumberOfControlPoints;
-    std::cerr << "\n********************************************************\n";
     this->options                  = options;
     iteration                      = 1;
     previousObjectiveFunctionValue = std::numeric_limits<double>::infinity();
@@ -44,6 +37,17 @@ public:
     convergenceThreshold           = options->convergenceThreshold;
     SQP_ACC                        = options->OptiNLC_ACC;
     maxNumberOfIteration           = options->maxNumberOfIteration;
+    debugPrint                     = options->debugPrint;
+    if( debugPrint )
+    {
+      std::cerr << "\n********************************************************";
+      std::cerr << "\nSequential Quadratic Problem has created an optimization problem";
+      std::cerr << "\nNumber of Inputs:         " << InputSize;
+      std::cerr << "\nNumber of States:         " << StateSize;
+      std::cerr << "\nNumber of Constraints:    " << ConstraintSize;
+      std::cerr << "\nNumber of Control Points: " << NumberOfControlPoints;
+      std::cerr << "\n********************************************************\n";
+    }
     hessian.setZero( InputSize, InputSize );
     hessian.setIdentity();
     _QP = std::make_shared<OptiNLC_QP<Scalar, InputSize, StateSize, ConstraintSize, NumberOfControlPoints>>( options );
@@ -178,7 +182,7 @@ public:
 
       bool CONVERGENCE = termination( L_gradient, LAMBDA, u, Problem.getConstraints(), Problem.getL(), Problem.getU(), solution.primal,
                                       solution.dual, alpha, convergence );
-      if( CONVERGENCE )
+      if( CONVERGENCE && debugPrint )
       {
         Status = true;
         std::cerr << greenCode << "\nConverged at iteration  : " << iteration;
@@ -199,7 +203,7 @@ public:
         break;
       }
     } // for loop
-    if( !Status )
+    if( !Status && debugPrint )
     {
       std::cerr << redCode << "NOT Converged. Iteration  : " << iteration;
       if( timeLimitReached )
@@ -462,6 +466,7 @@ private:
   bool                              timeLimitReached;
   double                            totalTime;
   int                               deteriorationCounter;
+  bool                              debugPrint;
   std::string                       orangeCode = "\033[38;5;208m";
   std::string                       redCode    = "\033[38;5;196m";
   std::string                       greenCode  = "\033[38;5;46m";
