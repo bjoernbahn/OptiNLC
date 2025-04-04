@@ -9,9 +9,11 @@ SUBMODULES_PATH?=${ROOT_DIR}
 .EXPORT_ALL_VARIABLES:
 DOCKER_BUILDKIT?=1
 DOCKER_CONFIG?=
+ARCH := $(shell uname -m)
+
 
 PROJECT:=optinlc
-TAG := $(shell git rev-parse --short HEAD)
+TAG := $(shell git rev-parse --short HEAD)_${ARCH}
 
 .PHONY: show-hash
 show-hash:
@@ -41,6 +43,7 @@ build: clean init_submodules build_mathematics_toolbox _build
 _build:
 	docker build --network host \
                  --tag ${PROJECT}:${TAG} \
+                 --build-arg ARCH=${ARCH} \
                  --build-arg PROJECT=${PROJECT} .
 	docker cp $$(docker create --rm ${PROJECT}:${TAG}):/tmp/OptiNLC/OptiNLC/build "${ROOT_DIR}/OptiNLC"
 
