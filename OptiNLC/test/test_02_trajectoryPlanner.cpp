@@ -158,7 +158,7 @@ TEST_CASE( "OCP Test NEW FORMAT:" )
   auto opt_u = _solver.get_optimal_inputs();
   // Open a file for writing
 
-  std::ofstream dataFile( "eigen_data.txt" );
+  std::ofstream dataFile( "eigen_data_02.txt" );
   //input shall be one smaller than values
   REQUIRE (opt_x.size() / StateSize == opt_u.size() / InputSize + 1);
 
@@ -182,6 +182,7 @@ TEST_CASE( "OCP Test NEW FORMAT:" )
   else
   {
     std::cerr << "Unable to open file for writing." << std::endl;
+    REQUIRE( false );
   }
 
 
