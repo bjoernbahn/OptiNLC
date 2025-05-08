@@ -130,7 +130,7 @@ TEST_CASE( "TEST Inverted Pendulum:" )
                   << " " << opt_x[StateSize*i + 3] << std::endl;
       }
       dataFile.close();
-      std::cout << "Data saved to eigen_data.txt" << std::endl;
+      std::cout << "Data saved to eigen_data_01.txt" << std::endl;
   } else {
       std::cerr << "Unable to open file for writing." << std::endl;
       REQUIRE( false );

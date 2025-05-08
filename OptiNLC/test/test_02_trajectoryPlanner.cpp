@@ -177,7 +177,7 @@ TEST_CASE( "OCP Test NEW FORMAT:" )
       }
     }
     dataFile.close();
-    std::cout << "Data saved to eigen_data.txt" << std::endl;
+    std::cout << "Data saved to eigen_data_02.txt" << std::endl;
   }
   else
   {
@@ -190,7 +190,7 @@ TEST_CASE( "OCP Test NEW FORMAT:" )
   {
     double minDiffPrev = std::abs(std::min(opt_u[InputSize * i - 4] - opt_u[InputSize * i - 2], opt_u[InputSize * i - 2] - opt_u[InputSize * i - 4]));
     double minDiffNow = std::abs(std::min(opt_u[InputSize * i - 2] - opt_u[InputSize * i], opt_u[InputSize * i] - opt_u[InputSize * i - 2]));
-    std::cout << std::abs(opt_u[InputSize * i - 2])  << " " << std::abs(opt_u[InputSize * i]) << std::endl;
+
     //the optimization shall need an input, that is always smaller than before
     //or the difference shall not getting larger
     //no oscillation shall happen
