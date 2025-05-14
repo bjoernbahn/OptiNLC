@@ -1,3 +1,8 @@
+/*
+* Author: Björn Bahn
+* Email: bjoern.bahn@dlr.de
+*/
+
 #include <catch2/catch.hpp>
 #include "OptiNLC_Data.h"
 
