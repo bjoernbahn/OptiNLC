@@ -1,7 +1,8 @@
 ARG PROJECT
+ARG ARCH
 
-FROM eigen3:latest AS eigen3 
-FROM osqp:latest AS osqp 
+FROM eigen3:latest_${ARCH} AS eigen3 
+FROM osqp:latest_${ARCH} AS osqp 
 
 FROM debian:stable-slim AS optinlc_requirements_base
 
