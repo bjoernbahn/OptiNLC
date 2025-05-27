@@ -5,6 +5,8 @@
 #include "OptiNLC_Data.h"
 #include "OptiNLC_Options.h"
 #include "OptiNLC_Solver.h"
+
+#include "fileCompare.h"
 #include <catch2/catch.hpp>
 
 TEST_CASE( "OCP Test NEW FORMAT:" )
@@ -196,4 +198,6 @@ TEST_CASE( "OCP Test NEW FORMAT:" )
     //no oscillation shall happen
     REQUIRE((std::abs(opt_u[InputSize * i - 2]) > std::abs(opt_u[InputSize * i]) || minDiffPrev > minDiffNow));
   }
+  
+  REQUIRE(filesAreEqual("eigen_data_02.txt", "expected_output/eigen_data_02.txt"));
 }

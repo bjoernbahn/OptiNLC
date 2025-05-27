@@ -24,8 +24,6 @@ RUN --mount=target=/var/lib/apt/lists,type=cache,sharing=locked \
     xargs apt-get install --no-install-recommends -y < ${REQUIREMENTS_FILE} && \
     rm -rf /var/lib/apt/lists/*
 
-COPY OptiNLC /tmp/OptiNLC/OptiNLC
-
 COPY --from=eigen3 /tmp/eigen3 /tmp/eigen3 
 WORKDIR /tmp/eigen3/build
 RUN make install
@@ -34,6 +32,7 @@ COPY --from=osqp /tmp/osqp /tmp/osqp
 WORKDIR /tmp/osqp/build
 RUN dpkg -i osqp*.deb 
 
+COPY OptiNLC /tmp/OptiNLC/OptiNLC
 WORKDIR /tmp/OptiNLC
 COPY *.txt .
 

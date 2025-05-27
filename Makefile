@@ -4,6 +4,7 @@ SHELL:=/bin/bash
 
 ROOT_DIR:=$(shell dirname "$(realpath $(firstword $(MAKEFILE_LIST)))")
 OUTPUT_DIRECTORY=${ROOT_DIR}/output
+EXPECTED_TEST_OUTPUT_DIRECTORY=${ROOT_DIR}/OptiNLC/test/expected_output
 SUBMODULES_PATH?=${ROOT_DIR}
 
 .EXPORT_ALL_VARIABLES:
@@ -74,6 +75,7 @@ _build: check_cross_compile_deps
 .PHONY: test
 test: build
 	mkdir -p ${OUTPUT_DIRECTORY}
+	cp -r ${EXPECTED_TEST_OUTPUT_DIRECTORY} ${OUTPUT_DIRECTORY} 
 	docker run -t -v ${OUTPUT_DIRECTORY}:/tmp/output --platform $(DOCKER_PLATFORM) ${PROJECT}:${TAG} /bin/bash -c 'cd /tmp/output && /tmp/OptiNLC/OptiNLC/build/OptiNLC_TestRunner -d yes'
 
 

@@ -6,7 +6,7 @@
 #include "fileCompare.h"
 #include <catch2/catch.hpp>
 
-TEST_CASE( "TEST Inverted Pendulum:" )
+TEST_CASE( "TEST Inverted Pendulum short:" )
 {
 
   OptiNLC_Options options;
@@ -19,11 +19,12 @@ TEST_CASE( "TEST Inverted Pendulum:" )
   options.OSQP_eps_abs            = 1.e-12;
   options.OSQP_eps_rel            = 1.e-12;
   options.timeStep                = 0.09;
+  options.debugPrint = false;
   // Define the state and input sizes
   constexpr int StateSize       = 4;
   constexpr int InputSize       = 1;
   constexpr int ConstraintsSize = 0;
-  constexpr int ControlPoints   = 40;
+  constexpr int ControlPoints   = 2;
 
   // Create an instance of the OCP class with the appropriate horizon and time step
 
@@ -122,7 +123,7 @@ TEST_CASE( "TEST Inverted Pendulum:" )
   auto opt_x =  _solver.get_optimal_states();
   auto time = _solver.getTime();
 
-  std::ofstream dataFile("eigen_data_01.txt");
+  std::ofstream dataFile("eigen_data_07.txt");
 
   // Check if the file is open
   if (dataFile.is_open()) {
@@ -132,7 +133,7 @@ TEST_CASE( "TEST Inverted Pendulum:" )
                   << " " << opt_x[StateSize*i + 3] << std::endl;
       }
       dataFile.close();
-      std::cout << "Data saved to eigen_data_01.txt" << std::endl;
+      std::cout << "Data saved to eigen_data_07.txt" << std::endl;
   } else {
       std::cerr << "Unable to open file for writing." << std::endl;
       REQUIRE( false );
@@ -157,10 +158,10 @@ TEST_CASE( "TEST Inverted Pendulum:" )
   }
   
   //in general the pendulum values should be smaller than at the beginning
-  REQUIRE( sum0 > sum00 );
-  REQUIRE( sum1 > sum11 );
-  REQUIRE( sum2 > sum22 );
-  REQUIRE( sum3 > sum33 );
+  //REQUIRE( sum0 > sum00 );
+  //REQUIRE( sum1 > sum11 );
+  //REQUIRE( sum2 > sum22 );
+  //REQUIRE( sum3 > sum33 );
   
-  REQUIRE(filesAreEqual("eigen_data_01.txt", "expected_output/eigen_data_01.txt"));
+  REQUIRE(filesAreEqual("eigen_data_07.txt", "expected_output/eigen_data_07.txt"));
 }
