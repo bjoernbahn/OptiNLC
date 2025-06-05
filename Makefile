@@ -76,8 +76,18 @@ _build: check_cross_compile_deps
 test: build
 	mkdir -p ${OUTPUT_DIRECTORY}
 	cp -r ${EXPECTED_TEST_OUTPUT_DIRECTORY} ${OUTPUT_DIRECTORY} 
-	docker run -t -v ${OUTPUT_DIRECTORY}:/tmp/output --platform $(DOCKER_PLATFORM) ${PROJECT}:${TAG} /bin/bash -c 'cd /tmp/output && /tmp/OptiNLC/OptiNLC/build/OptiNLC_TestRunner -d yes'
+	docker run -t -v ${OUTPUT_DIRECTORY}:/tmp/output --platform $(DOCKER_PLATFORM) ${PROJECT}:${TAG} /bin/bash -c 'cd /tmp/output && \
+        /tmp/OptiNLC/OptiNLC/build/OptiNLC_TestRunner -d yes ;'
 
+.PHONY: test_and_visualize
+test_and_visualize: build
+	mkdir -p ${OUTPUT_DIRECTORY}
+	cp -r ${EXPECTED_TEST_OUTPUT_DIRECTORY} ${OUTPUT_DIRECTORY}
+	docker run -t -v ${OUTPUT_DIRECTORY}:/tmp/output --platform $(DOCKER_PLATFORM) ${PROJECT}:${TAG} /bin/bash -c 'cd /tmp/output && \
+        chmod +x /tmp/OptiNLC/OptiNLC/test/install_for_vis.sh && \
+        /tmp/OptiNLC/OptiNLC/build/OptiNLC_TestRunner -d yes ; \
+        /tmp/OptiNLC/OptiNLC/test/install_for_vis.sh && \
+        /opt/venv/bin/python /tmp/OptiNLC/OptiNLC/test/test_07_result_visualization.py'
 
 .PHONY: plot
 plot: 

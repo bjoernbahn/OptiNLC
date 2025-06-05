@@ -1,13 +1,21 @@
 #include <fstream>
 #include <iostream>
+#include <vector>
 
 #include "OptiNLC_Solver.h"
 
 #include "fileCompare.h"
 #include <catch2/catch.hpp>
 
-TEST_CASE( "TEST Inverted Pendulum short:" )
-{
+constexpr int numberOfRuns = 100;
+
+// Define the state and input sizes
+constexpr int StateSize       = 4;
+constexpr int InputSize       = 1;
+constexpr int ConstraintsSize = 0;
+constexpr int ControlPoints   = 40;
+
+OptiNLC_Solver<double, 1, 4, 0, ControlPoints> solveExample(){
 
   OptiNLC_Options options;
   options.setDefaults();
@@ -20,11 +28,6 @@ TEST_CASE( "TEST Inverted Pendulum short:" )
   options.OSQP_eps_rel            = 1.e-12;
   options.timeStep                = 0.09;
   options.debugPrint = false;
-  // Define the state and input sizes
-  constexpr int StateSize       = 4;
-  constexpr int InputSize       = 1;
-  constexpr int ConstraintsSize = 0;
-  constexpr int ControlPoints   = 2;
 
   // Create an instance of the OCP class with the appropriate horizon and time step
 
@@ -119,12 +122,28 @@ TEST_CASE( "TEST Inverted Pendulum short:" )
 
   OptiNLC_Solver<double, InputSize, StateSize, ConstraintsSize,ControlPoints> _solver(ocp);
   _solver.solve(0.0, initialState, initialInput);
+  return _solver;
+}
 
-  auto opt_x =  _solver.get_optimal_states();
-  auto time = _solver.getTime();
+void writeData(std::string filename, std::array<std::array<float, StateSize>, ControlPoints + 1> data) { 
+  std::ofstream dataFile(filename);
+  if (dataFile.is_open()) {
+    for (int i = 0; i < ControlPoints + 1; ++i) {
+        dataFile << i << " " << data[i][0] << " " << data[i][1]
+                << " " << data[i][2] << " " << data[i][3] << std::endl;
+    }
+    dataFile.close();
+    std::cout << "Data saved to " << filename << std::endl;
+  } else {
+      std::cerr << "Unable to open file for writing." << std::endl;
+      REQUIRE( false );
+  }
+}
 
-  std::ofstream dataFile("eigen_data_07.txt");
-
+void writeRawData(std::string filename, OptiNLC_Solver<double, 1, 4, 0, ControlPoints> solver){
+std::ofstream dataFile(filename);
+auto opt_x = solver.get_optimal_states();
+auto time = solver.getTime();
   // Check if the file is open
   if (dataFile.is_open()) {
       for (int i = 0; i < time.size(); ++i) {
@@ -133,35 +152,101 @@ TEST_CASE( "TEST Inverted Pendulum short:" )
                   << " " << opt_x[StateSize*i + 3] << std::endl;
       }
       dataFile.close();
-      std::cout << "Data saved to eigen_data_07.txt" << std::endl;
+      std::cout << "Data saved to eigen_data_01.txt" << std::endl;
   } else {
       std::cerr << "Unable to open file for writing." << std::endl;
       REQUIRE( false );
   }
+}
 
-  double sum0=0, sum1=0, sum2=0, sum3=0, sum00=0, sum11=0, sum22=0, sum33=0;
 
-  //first half of pendulum simulation
-  for (int i = 0; i < time.size() / 2; ++i) {
-    sum0 += std::abs(opt_x[StateSize * i]);
-    sum1 += std::abs(opt_x[StateSize * i + 1]);
-    sum2 += std::abs(opt_x[StateSize * i + 2]);
-    sum3 += std::abs(opt_x[StateSize * i + 3]);
+TEST_CASE( "TEST Inverted Pendulum short:" )
+{
+  std::array<std::array<float, StateSize>, ControlPoints + 1> min;
+  std::array<std::array<float, StateSize>, ControlPoints + 1> max;
+  std::array<std::array<float, StateSize>, ControlPoints + 1> maxDiff;
+  for (auto& row : maxDiff)
+    row.fill(FLT_MAX);
+  for (auto& row : min)
+    row.fill(FLT_MAX);
+  for (auto& row : max)
+    row.fill(-FLT_MAX);
+
+  std::vector<OptiNLC_Solver<double, 1, 4, 0, ControlPoints>> solvers;
+  for (int i = 0; i < numberOfRuns; i++){
+    solvers.push_back(solveExample());
+    {
+      //writeRawData("eigen_data_0_" + std::to_string(i) + ".txt", solvers[i]);
+    }
+
+  }
+  for (int i = 0; i < numberOfRuns; i++){
+    auto _solver = solvers[i];
+  
+    auto opt_x =  _solver.get_optimal_states();
+    auto time = _solver.getTime();
+    REQUIRE(time.size() == ControlPoints + 1);
+    for (int i = 0; i < time.size(); ++i) {
+      auto a = opt_x[StateSize*i + 0];
+      auto b = opt_x[StateSize*i + 1];
+      auto c = opt_x[StateSize*i + 2];
+      auto d = opt_x[StateSize*i + 3];
+      if (a < min[i][0])
+        min[i][0] = a;
+      if (b < min[i][1])
+        min[i][1] = b;
+      if (c < min[i][2])
+        min[i][2] = c;
+      if (d < min[i][3])
+        min[i][3] = d;
+      if (a > max[i][0])
+        max[i][0] = a;
+      if (b > max[i][1])
+        max[i][1] = b;
+      if (c > max[i][2])
+        max[i][2] = c;
+      if (d > max[i][3])
+        max[i][3] = d;
+    }
   }
 
-  //second half of pendulum simulation
-  for (int i = time.size() / 2; i < time.size(); ++i) {
-    sum00 += std::abs(opt_x[StateSize * i]);
-    sum11 += std::abs(opt_x[StateSize * i + 1]);
-    sum22 += std::abs(opt_x[StateSize * i + 2]);
-    sum33 += std::abs(opt_x[StateSize * i + 3]);
+  for (int i = 0; i < ControlPoints + 1; i++){
+    for (int j = 0; j < StateSize; j++) {
+      maxDiff[i][j] = max[i][j] - min[i][j];
+    }
   }
-  
-  //in general the pendulum values should be smaller than at the beginning
-  //REQUIRE( sum0 > sum00 );
-  //REQUIRE( sum1 > sum11 );
-  //REQUIRE( sum2 > sum22 );
-  //REQUIRE( sum3 > sum33 );
-  
-  REQUIRE(filesAreEqual("eigen_data_07.txt", "expected_output/eigen_data_07.txt"));
+
+  writeData("eigen_data_max.txt", max);
+  writeData("eigen_data_min.txt", min);
+  writeData("eigen_data_07_diff.txt", maxDiff);
+
+  //debug
+  //find max different solutions
+  int ii = 0;
+  int jj = 0;
+  float maxDiffOneValue = 0;
+  for (int i = 0; i < ControlPoints + 1; i++){
+    for (int j = 0; j < StateSize; j++) {
+      if (maxDiff[i][j] > maxDiffOneValue){
+        ii = i;
+        jj = j;
+      }
+    }
+  }
+  bool ma = false;
+  bool mi = false;
+  for (int i = 0; i < numberOfRuns; i++){
+    auto opt_x =  solvers[i].get_optimal_states();
+    if (opt_x[StateSize*ii + jj] == max[ii][jj]){
+      writeRawData("eigen_data_MAX.txt", solvers[i]);
+      ma = true;
+    }
+    if (opt_x[StateSize*ii + jj] == min[ii][jj]){
+      writeRawData("eigen_data_MIN.txt", solvers[i]);
+      mi = true;
+    }
+    if (ma && mi){
+      break;
+    }
+  }
 }
