@@ -58,16 +58,18 @@ build: clean init_submodules build_mathematics_toolbox _build
 _build: check_cross_compile_deps
 	@if [ "$(CROSS_COMPILE)" = "true" ]; then \
         echo "Cross-compiling ${PROJECT}:${TAG} for $(ARCH)..."; \
-        docker buildx build --platform $(DOCKER_PLATFORM) \
-                 --tag ${PROJECT}:${TAG} \
-                 --build-arg ARCH=${ARCH} \
-                 --build-arg PROJECT=${PROJECT} \
-                 --load .; \
+        docker buildx build \
+            --builder=default \
+            --platform=$(DOCKER_PLATFORM) \
+            --tag ${PROJECT}:${TAG} \
+            --build-arg ARCH=$(ARCH) \
+            --build-arg PROJECT=$(PROJECT) \
+            --load .; \
     else \
         docker build --network host \
-                 --tag ${PROJECT}:${TAG} \
-                 --build-arg ARCH=${ARCH} \
-                 --build-arg PROJECT=${PROJECT} .; \
+            --tag ${PROJECT}:${TAG} \
+            --build-arg ARCH=$(ARCH) \
+            --build-arg PROJECT=$(PROJECT) .; \
     fi
 	docker cp $$(docker create --rm ${PROJECT}:${TAG}):/tmp/OptiNLC/OptiNLC/build "${ROOT_DIR}/OptiNLC"
 
