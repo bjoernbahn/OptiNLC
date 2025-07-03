@@ -89,8 +89,9 @@ run: build
 
 .PHONY: clean
 clean:  ## Clean OptiNLC build artifacts 
-	rm -rf "${ROOT_DIR}/${PROJECT}/build"
+	rm -rf "OptiNLC/build"
 	rm -rf "${OUTPUT_DIRECTORY}"
+	cd mathematics_toolbox && make clean
 	docker rm $$(docker ps -a -q --filter "ancestor=${PROJECT}:${TAG}") --force 2> /dev/null || true
 	docker rmi $$(docker images -q ${PROJECT}:${TAG}) --force 2> /dev/null || true
 	docker rmi --force $$(docker images --filter "dangling=true" -q --no-trunc) 2> /dev/null || true
