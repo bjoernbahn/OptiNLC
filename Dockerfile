@@ -4,7 +4,7 @@ ARG ARCH
 FROM eigen3:latest_${ARCH} AS eigen3 
 FROM osqp:latest_${ARCH} AS osqp 
 
-FROM debian:stable-slim AS optinlc_requirements_base
+FROM debian:bookworm-slim AS optinlc_requirements_base
 
 ARG PROJECT
 ARG REQUIREMENTS_FILE="requirements.OptiNLC.system"
